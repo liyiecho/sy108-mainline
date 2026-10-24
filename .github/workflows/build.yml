@@ -1,0 +1,75 @@
+name: Build SY108 Mainline OpenWrt & Kernel
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - '.github/workflows/**'
+
+jobs:
+  build:
+    name: Build OpenWrt & Linux 7.3 (Native ARM64)
+    runs-on: ubuntu-24.04-arm
+    timeout-minutes: 180
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: System Resource & Storage Info
+        run: |
+          echo "=== CPU Info ==="
+          lscpu
+          echo "=== Memory Info ==="
+          free -h
+          echo "=== Disk Info ==="
+          df -h
+
+      - name: Install Host Tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y python3 python3-pip git rsync curl
+
+      - name: Bootstrap OpenWrt & Linux Tree
+        env:
+          SY108_JOBS: 4
+          SY108_MEMORY: 12g
+        run: |
+          python3 tools/bootstrap.py
+
+      - name: Build Main Profile Firmware
+        env:
+          SY108_JOBS: 4
+          SY108_MEMORY: 12g
+        run: |
+          python3 tools/build/firmware.py main --jobs 4
+
+      - name: Build Recovery Profile Firmware
+        env:
+          SY108_JOBS: 4
+          SY108_MEMORY: 12g
+        run: |
+          python3 tools/build/firmware.py recovery --jobs 4
+
+      - name: Collect & Checksum Artifacts
+        run: |
+          mkdir -p /tmp/sy108-artifacts
+          cp -v out/images/main/sysupgrade.bin /tmp/sy108-artifacts/openwrt-main-sysupgrade.bin || true
+          cp -v out/images/main/boot.bin /tmp/sy108-artifacts/main-boot.bin || true
+          cp -v out/images/recovery/boot.bin /tmp/sy108-artifacts/recovery-boot.bin || true
+          cp -v out/images/main/build.json /tmp/sy108-artifacts/main-build.json || true
+          cp -v out/images/recovery/build.json /tmp/sy108-artifacts/recovery-build.json || true
+          cd /tmp/sy108-artifacts
+          sha256sum * > SHA256SUMS
+          cat SHA256SUMS
+
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: sy108-mainline-firmware
+          path: /tmp/sy108-artifacts/
+          retention-days: 14
