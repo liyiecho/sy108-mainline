@@ -64,7 +64,7 @@ for previous in output.iterdir():
 for source in bin_dir.iterdir():
     if source.is_file():
         shutil.copy2(source, output / source.name)
-kernel = tree / f'build_dir/target-aarch64_cortex-a55_musl/linux-sprd_udx710/linux-{lock["version"]}'
+kernel = tree / f'build_dir/target-aarch64_cortex-a53_musl/linux-sprd_udx710/linux-{lock["version"]}'
 # OpenWrt derives the target triplet from the selected profile.
 if not kernel.is_dir():
     candidates = list((tree / 'build_dir').glob(f'target-*/linux-sprd_udx710/linux-{lock["version"]}'))

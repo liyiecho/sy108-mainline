@@ -80,7 +80,7 @@ jobs:
         profile: [main, recovery]
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0
           # fetch-depth: 0 只保证历史和分支取全，**tag 引用**在"按 tag 触发"的那次
@@ -93,7 +93,7 @@ jobs:
           submodules: recursive
 
       - name: Cache build tree and downloads
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: |
             out/openwrt-build
@@ -287,7 +287,7 @@ jobs:
           echo "USB3 LPM quirks present and fixed-${want} role verified in $dtb"
 
       - name: Upload ${{ matrix.profile }} artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: ${{ env.ARTIFACT_PREFIX }}-${{ matrix.profile }}-${{ env.BUILD_STAMP }}
           path: artifact/${{ matrix.profile }}
@@ -305,7 +305,7 @@ jobs:
       BUILD_STAMP: ${{ needs.meta.outputs.build_stamp }}
     steps:
       - name: Download artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           path: artifact
 
@@ -320,7 +320,7 @@ jobs:
           mv artifact/${{ env.ARTIFACT_PREFIX }}-recovery-${{ env.BUILD_STAMP }}/SHA256SUMS artifact/${{ env.ARTIFACT_PREFIX }}-recovery-${{ env.BUILD_STAMP }}/SHA256SUMS-recovery
 
       - name: Publish release
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v3
         with:
           files: |
             artifact/${{ env.ARTIFACT_PREFIX }}-main-${{ env.BUILD_STAMP }}/sysupgrade.bin
