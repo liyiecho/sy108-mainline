@@ -1353,7 +1353,7 @@ function ota_check() {
 	    acc != 'https://githubproxy.cc/' &&
 	    (length(acc) > 200 || match(acc, /^https?:\/\/[A-Za-z0-9._~:\/\[\]-]+$/) == null))
 		acc = '';
-	let api = 'https://api.github.com/repos/lai-art/sy108-mainline/releases/latest';
+	let api = 'https://api.github.com/repos/liyiecho/sy108-mainline/releases/latest';
 	let rel = null;
 	let via = 'direct';
 	let urls = acc ? [ acc + api, api ] : [ api ];
@@ -1393,7 +1393,7 @@ function ota_check() {
 		let cf = '/tmp/.udx-ota-commit.json';
 		system(sprintf("curl -sS -m 8 -H 'Accept: application/vnd.github+json' "
 		             + "-H 'User-Agent: sy108-ota' -o %s "
-		             + "https://api.github.com/repos/lai-art/sy108-mainline/commits/%s 2>/dev/null",
+		             + "https://api.github.com/repos/liyiecho/sy108-mainline/commits/%s 2>/dev/null",
 		               cf, rtag));
 		let cm = null;
 		try { cm = json(_rd(cf)); } catch (e) { cm = null; }
